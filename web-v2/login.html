@@ -373,13 +373,37 @@
     /* Mobile Phones (Below 480px) */
     @media (max-width: 480px) {
       body {
-        padding: 10px;
+        padding: 15px;
+        overflow-y: auto; /* Allow scrolling for long content */
+      }
+      .main-wrapper {
+        flex-direction: column;
+        border-radius: 16px;
       }
       .side-panel {
-        display: none; /* Hide side panel on very small screens to focus on login */
+        padding: 30px 20px;
+        flex: none;
+      }
+      .brand-logo-container {
+        margin-bottom: 20px;
+        padding: 8px 16px;
+      }
+      .brand-logo {
+        width: 120px;
+      }
+      .info-content h2 {
+        font-size: 22px;
+      }
+      .info-content p {
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+      .projects-grid {
+        grid-template-columns: repeat(4, 1fr); /* 4 columns on mobile for better visibility */
+        gap: 6px;
       }
       .form-panel {
-        padding: 35px 20px;
+        padding: 30px 20px;
       }
       .form-header h1 {
         font-size: 24px;
@@ -392,21 +416,20 @@
         padding: 15px 0;
       }
       .scroller-inner img {
-        height: 30px;
-        margin: 0 20px;
+        height: 25px;
+        margin: 0 15px;
       }
     }
 
-    /* Landscape specific adjustments for mobile */
+    /* Adjust landscape to allow scrolling */
     @media (max-height: 500px) and (orientation: landscape) {
       body {
         align-items: flex-start;
+        overflow-y: auto;
       }
       .main-wrapper {
         min-height: auto;
-      }
-      .side-panel {
-        display: none;
+        flex-direction: column;
       }
     }
   </style>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meghdoot Pumps | Secure Portal</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #062e5f;
+      --accent: #37aed0;
+      --accent-hover: #2d94b1;
+      --bg-dark: #010c1a;
+      --text-main: #1a202c;
+      --text-muted: #718096;
+      --white: #ffffff;
+      --input-bg: #f8fafc;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 10% 10%, rgba(55, 174, 208, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(6, 46, 95, 0.2) 0%, transparent 40%);
+      overflow-x: hidden;
+      padding: 20px;
+    }
+
+    .main-wrapper {
+      width: 95%;
+      max-width: 1100px;
+      background: var(--white);
+      border-radius: 24px;
+      display: flex;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      z-index: 1;
+      animation: fadeIn 0.8s ease-out;
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Side Panel */
+    .side-panel {
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary) 0%, #03152d 100%);
+      color: var(--white);
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .brand-logo-container {
+      background: var(--white);
+      padding: 15px 25px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .brand-logo {
+      width: 180px;
+      display: block;
+    }
+
+    .info-content h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      line-height: 1.2;
+      color: var(--accent);
+    }
+
+    .info-content p {
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.6;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    /* Projects Gallery */
+    .projects-section h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .project-img-box {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .project-img-box:hover {
+      transform: scale(1.05);
+      border-color: var(--accent);
+      z-index: 2;
+    }
+
+    .project-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Form Panel */
+    .form-panel {
+      flex: 1.1;
+      padding: 60px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--white);
+    }
+
+    .form-header {
+      margin-bottom: 40px;
+    }
+
+    .form-header h1 {
+      font-size: 32px;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .form-header p {
+      color: var(--text-muted);
+    }
+
+    .input-field {
+      margin-bottom: 24px;
+    }
+
+    .input-field label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 14px 16px 14px 45px;
+      border: 2px solid #edf2f7;
+      border-radius: 12px;
+      outline: none;
+      font-size: 15px;
+      background: var(--input-bg);
+      transition: all 0.3s;
+    }
+
+    .input-wrapper input:focus {
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(55, 174, 208, 0.1);
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: var(--primary);
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 10px 20px rgba(6, 46, 95, 0.2);
+    }
+
+    .submit-btn:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(55, 174, 208, 0.3);
+    }
+
+    /* Brand Scroller */
+    .brand-scroller {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px 0;
+      margin-top: 40px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Edge Fade Effect */
+    .brand-scroller::before,
+    .brand-scroller::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 150px;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .brand-scroller::before {
+      left: 0;
+      background: linear-gradient(to right, var(--bg-dark) 0%, transparent 100%);
+    }
+
+    .brand-scroller::after {
+      right: 0;
+      background: linear-gradient(to left, var(--bg-dark) 0%, transparent 100%);
+    }
+
+    .scroller-inner {
+      display: flex;
+      width: max-content;
+      animation: scroll 30s linear infinite;
+    }
+
+    .scroller-inner img {
+      height: 45px;
+      margin: 0 40px;
+      filter: grayscale(1) brightness(2) contrast(0.8);
+      opacity: 0.6;
+      transition: all 0.3s;
+    }
+
+    .scroller-inner img:hover {
+      filter: grayscale(0) brightness(1);
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    @keyframes scroll {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* Responsive Breakpoints */
+    
+    /* Desktop & Large Tablets (Above 1024px) */
+    @media (min-width: 1025px) {
+      .main-wrapper {
+        flex-direction: row;
+      }
+    }
+
+    /* Tablets (768px to 1024px) */
+    @media (max-width: 1024px) {
+      .main-wrapper {
+        flex-direction: column;
+        max-width: 700px;
+        margin: 20px auto;
+      }
+      .side-panel {
+        padding: 40px;
+        flex: none;
+      }
+      .form-panel {
+        padding: 50px 60px;
+      }
+      .projects-grid {
+        grid-template-columns: repeat(8, 1fr);
+      }
+    }
+
+    /* Large Phones & Small Tablets (480px to 767px) */
+    @media (max-width: 767px) {
+      .main-wrapper {
+        max-width: 100%;
+        border-radius: 16px;
+      }
+      .side-panel {
+        padding: 30px;
+      }
+      .info-content h2 {
+        font-size: 24px;
+      }
+      .form-panel {
+        padding: 40px 30px;
+      }
+      .form-header h1 {
+        font-size: 26px;
+      }
+      .brand-logo-container {
+        margin-bottom: 25px;
+        padding: 10px 20px;
+      }
+      .brand-logo {
+        width: 140px;
+      }
+    }
+
+    /* Mobile Phones (Below 480px) */
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      .side-panel {
+        display: none; /* Hide side panel on very small screens to focus on login */
+      }
+      .form-panel {
+        padding: 35px 20px;
+      }
+      .form-header h1 {
+        font-size: 24px;
+      }
+      .submit-btn {
+        padding: 14px;
+        font-size: 15px;
+      }
+      .brand-scroller {
+        padding: 15px 0;
+      }
+      .scroller-inner img {
+        height: 30px;
+        margin: 0 20px;
+      }
+    }
+
+    /* Landscape specific adjustments for mobile */
+    @media (max-height: 500px) and (orientation: landscape) {
+      body {
+        align-items: flex-start;
+      }
+      .main-wrapper {
+        min-height: auto;
+      }
+      .side-panel {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="main-wrapper">
+    <!-- Left Section: Meghdoot Info -->
+    <section class="side-panel">
+      <div>
+        <div class="brand-logo-container">
+          <img src="https://www.meghdootpumps.com/assets/images/resources/logo-1.png" alt="Meghdoot Logo"
+            class="brand-logo">
+        </div>
+
+        <div class="info-content">
+          <h2>World-Class Pumping Solutions</h2>
+          <p>Our vision is to provide all these solutions with a touch of sustainability and contribute to the green
+            foot prints of the planet.</p>
+        </div>
+
+        <div class="projects-section">
+          <h3>Projects</h3>
+          <div class="projects-grid">
+            <div class="project-img-box"><img src="https://www.meghdootpumps.com/assets/projects/11.jpg" alt="P1"></div>
+            <div class="project-img-box"><img src="https://www.meghdootpumps.com/assets/projects/12.jpg" alt="P2"></div>
+            <div class="project-img-box"><img src="https://www.meghdootpumps.com/assets/projects/13.jpg" alt="P3"></div>
+            <div class="project-img-box"><img src="https://www.meghdootpumps.com/assets/projects/14.jpg" alt="P4"></div>
+            <div class="project-img-box"><img src="https://www.meghdootpumps.com/assets/projects/15.jpg" alt="P5"></div>
+            <div class="project-img-box"><img src="https://www.meghdootpumps.com/assets/projects/16.jpg" alt="P6"></div>
+            <div class="project-img-box"><img src="https://www.meghdootpumps.com/assets/projects/17.jpg" alt="P7"></div>
+            <div class="project-img-box"><img src="https://www.meghdootpumps.com/assets/projects/18.jpg" alt="P8"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 30px;">
+        &copy; 2026 Meghdoot Pumps Pvt. Ltd.
+      </div>
+    </section>
+
+    <!-- Right Section: Login Form -->
+    <section class="form-panel">
+      <div class="form-header">
+        <h1>Portal Login</h1>
+        <p>Enter your credentials to continue</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="input-field">
+          <label for="email">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" placeholder="email@meghdoot.com" required>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox"> Remember me
+          </label>
+          <a href="#" class="forgot-link">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="submit-btn" id="loginBtn">
+          Sign In
+        </button>
+      </form>
+
+      <div style="margin-top: 30px; text-align: center; font-size: 14px; color: var(--text-muted);">
+        Need support? <a href="mailto:support@meghdootpumps.com"
+          style="color: var(--accent); text-decoration: none; font-weight: 600;">Contact IT Desk</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Brand Scroller -->
+  <div class="brand-scroller">
+    <div class="scroller-inner">
+      <img src="https://www.meghdootpumps.com/assets/clients/1.jpg" alt="Client 1">
+      <img src="https://www.meghdootpumps.com/assets/clients/2.jpg" alt="Client 2">
+      <img src="https://www.meghdootpumps.com/assets/clients/3.jpg" alt="Client 3">
+      <img src="https://www.meghdootpumps.com/assets/clients/4.jpg" alt="Client 4">
+      <img src="https://www.meghdootpumps.com/assets/clients/5.jpg" alt="Client 5">
+      <img src="https://www.meghdootpumps.com/assets/clients/6.jpg" alt="Client 6">
+      <img src="https://www.meghdootpumps.com/assets/clients/7.jpg" alt="Client 7">
+      <img src="https://www.meghdootpumps.com/assets/clients/8.jpg" alt="Client 8">
+      <!-- Duplicate for seamless loop -->
+      <img src="https://www.meghdootpumps.com/assets/clients/1.jpg" alt="Client 1">
+      <img src="https://www.meghdootpumps.com/assets/clients/2.jpg" alt="Client 2">
+      <img src="https://www.meghdootpumps.com/assets/clients/3.jpg" alt="Client 3">
+      <img src="https://www.meghdootpumps.com/assets/clients/4.jpg" alt="Client 4">
+      <img src="https://www.meghdootpumps.com/assets/clients/5.jpg" alt="Client 5">
+      <img src="https://www.meghdootpumps.com/assets/clients/6.jpg" alt="Client 6">
+      <img src="https://www.meghdootpumps.com/assets/clients/7.jpg" alt="Client 7">
+      <img src="https://www.meghdootpumps.com/assets/clients/8.jpg" alt="Client 8">
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const btn = document.getElementById('loginBtn');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+
+      setTimeout(() => {
+        alert('Authentication Successful! Redirecting to dashboard...');
+        btn.innerHTML = 'Sign In';
+        btn.disabled = false;
+      }, 1500);
+    });
+  </script>
+</body>
+
+</html>

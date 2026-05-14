@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grundfos Hydro MPC-E | Pump Monitoring & Control</title>
+    <meta name="description" content="Professional industrial pump monitoring and control dashboard. Real-time telemetry for Grundfos Hydro MPC-E systems.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Initial state: Hide app, show login */
+        #login-screen { display: flex; }
+        .app-container { display: none; }
+    </style>
+</head>
+<body class="theme-dark">
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-overlay">
+        <div class="login-card">
+            <div class="logo">
+                <i data-lucide="waves" class="logo-icon"></i>
+                <span>HYDRO MPC-E</span>
+            </div>
+            <h2>Industrial Login</h2>
+            <p>Access your monitoring & control systems</p>
+            <div class="login-form">
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="Enter username">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary btn-full" id="login-btn">Login</button>
+                <div class="login-hint">
+                    <p>Demo: <strong>admin</strong> / <strong>user</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="waves" class="logo-icon"></i>
+                    <span>HYDRO MPC-E</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" id="nav-dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-alerts">
+                    <i data-lucide="bell"></i>
+                    <span>Alerts</span>
+                    <span class="badge" id="alert-count">2</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-settings">
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </a>
+                
+                <a href="#" class="nav-item admin-only" id="nav-users" style="display: none;">
+                    <i data-lucide="users"></i>
+                    <span>Users</span>
+                </a>
+
+                <!-- View Mode: Back to Admin -->
+                <a href="#" class="nav-item" id="nav-back-admin" style="display: none; background: var(--accent-blue-dim); color: var(--accent-blue);">
+                    <i data-lucide="arrow-left-circle"></i>
+                    <span>Back to Admin</span>
+                </a>
+                
+                <!-- Admin Only: Pump Management Section -->
+                <div class="admin-only-nav" id="admin-pump-nav" style="display: none;">
+                    <div class="nav-divider"></div>
+                    <span class="nav-label">Managed Pumps</span>
+                    <div id="pump-list" class="pump-selector-list">
+                        <!-- Admin can see and switch between user pumps here -->
+                    </div>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar" id="user-avatar">AD</div>
+                    <div class="user-info">
+                        <p class="user-name" id="display-user-name">Admin User</p>
+                        <p class="user-role" id="display-user-role">Administrator</p>
+                    </div>
+                </div>
+                <button class="role-toggle-btn" id="role-toggle" title="Toggle Role (Demo)">
+                    <i data-lucide="repeat"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="header-left">
+                    <h1 id="view-title">System Dashboard</h1>
+                    <div id="pump-info-sub" class="header-sub">
+                        <p class="system-status">Status: <span class="status-indicator online"></span> Online</p>
+                        <span class="owner-label" id="pump-owner">Owner: -</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="timestamp" id="current-time">00:00:00 AM</div>
+                    <div class="refresh-status">
+                        <span class="refresh-spinner"></span>
+                        Auto-refreshing
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section active">
+                <section id="active-pump-name-banner" style="margin-bottom: 16px; font-weight: 600; color: var(--accent-blue);">
+                    Currently Viewing: <span id="active-pump-name-display">-</span>
+                </section>
+                <section class="dashboard-grid">
+                <!-- Status Card: Current Pressure -->
+                <div class="card stat-card" id="card-pressure">
+                    <div class="card-header">
+                        <span class="card-label">Current Pressure</span>
+                        <i data-lucide="gauge"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="card-value" id="val-pressure">5.20</span>
+                        <span class="card-unit">bar</span>
+                    </div>
+                    <div class="card-footer">
+                        <span class="trend-up"><i data-lucide="trending-up"></i> 2.1%</span>
+                        <span class="label-small">vs last hour</span>
+                    </div>
+                </div>
+
+                <!-- Status Card: Setpoint -->
+                <div class="card stat-card highlight" id="card-setpoint">
+                    <div class="card-header">
+                        <span class="card-label">Setpoint Pressure</span>
+                        <i data-lucide="target"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="card-value" id="val-setpoint">5.50</span>
+                        <span class="card-unit">bar</span>
+                    </div>
+                    <div class="card-footer" id="setpoint-controls-container">
+                        <!-- Controls will be injected here for Admin -->
+                    </div>
+                </div>
+
+                <!-- Status Card: Pump Status -->
+                <div class="card stat-card" id="card-status">
+                    <div class="card-header">
+                        <span class="card-label">Pump Status</span>
+                        <i data-lucide="activity"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="card-value status-text running" id="val-status">Running</span>
+                    </div>
+                    <div class="card-footer">
+                        <span class="label-small">Active Pumps: 2/3</span>
+                    </div>
+                </div>
+
+                <!-- Status Card: Frequency -->
+                <div class="card stat-card" id="card-frequency">
+                    <div class="card-header">
+                        <span class="card-label">Frequency</span>
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="card-value" id="val-frequency">48.5</span>
+                        <span class="card-unit">Hz</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Card: Flow Rate -->
+                <div class="card stat-card" id="card-flow">
+                    <div class="card-header">
+                        <span class="card-label">Flow Rate</span>
+                        <i data-lucide="droplets"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="card-value" id="val-flow">12.4</span>
+                        <span class="card-unit">m³/h</span>
+                    </div>
+                    <div class="card-footer">
+                        <span class="label-small">Load: 74%</span>
+                    </div>
+                </div>
+
+                <!-- Status Card: Power -->
+                <div class="card stat-card" id="card-power">
+                    <div class="card-header">
+                        <span class="card-label">Power / Current</span>
+                        <i data-lucide="cpu"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="multi-value">
+                            <div>
+                                <span class="val-small" id="val-voltage">400</span><span class="unit-small">V</span>
+                            </div>
+                            <div>
+                                <span class="val-small" id="val-current">8.2</span><span class="unit-small">A</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="label-small">L1-L2-L3 Balanced</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="secondary-grid">
+                <!-- Audit Log -->
+                <section class="card log-card">
+                    <div class="card-header">
+                        <h2 class="section-title">Audit Log</h2>
+                        <i data-lucide="history"></i>
+                    </div>
+                    <div class="log-container">
+                        <table class="log-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Old Val</th>
+                                    <th>New Val</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-log-body">
+                                <!-- Log entries will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Alarm History -->
+                <section class="card alarm-card">
+                    <div class="card-header">
+                        <h2 class="section-title">Active Alarms</h2>
+                        <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <div class="alarm-list" id="alarm-list">
+                        <!-- Alarms will be injected here -->
+                        <div class="alarm-item warning">
+                            <span class="alarm-time">10:45 AM</span>
+                            <span class="alarm-msg">Inlet Pressure Low (Warning)</span>
+                        </div>
+                        <div class="alarm-item danger">
+                            <span class="alarm-time">09:12 AM</span>
+                            <span class="alarm-msg">Dry Run Protection Triggered</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Alerts View -->
+            <div id="view-alerts" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>System Alerts & Notifications</h2>
+                        <button class="btn btn-secondary" id="btn-clear-alerts">Clear All</button>
+                    </div>
+                    <div class="alert-page-list" id="full-alert-list">
+                        <!-- Full list of alerts will go here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="view-settings" class="view-section">
+                <div class="card settings-card">
+                    <h2>Account Settings</h2>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label>Profile Name</label>
+                            <input type="text" id="setting-name" class="input-control">
+                        </div>
+                        <div class="setting-item">
+                            <label>Theme</label>
+                            <select class="input-control">
+                                <option>Industrial Dark</option>
+                                <option>High Contrast</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>Notification Frequency</label>
+                            <select class="input-control">
+                                <option>Real-time</option>
+                                <option>Hourly Summary</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="btn-save-settings">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users View (Admin Only) -->
+            <div id="view-users" class="view-section admin-only">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>User Management</h2>
+                        <button class="btn btn-primary" id="btn-add-user">+ Add User</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Managed Pumps</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-management-body">
+                                <!-- User rows go here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Detail Modal/View (Floating) -->
+            <div id="user-detail-panel" class="modal-overlay">
+                <div class="modal large-modal">
+                    <div class="card-header">
+                        <h2 id="detail-user-name">User Details</h2>
+                        <button class="btn-close" id="btn-close-modal-x">×</button>
+                    </div>
+                    <div class="user-edit-form">
+                        <div class="input-group">
+                            <label>Username</label>
+                            <input type="text" id="edit-username" class="input-control" readonly>
+                        </div>
+                        <div class="input-group">
+                            <label>Display Name</label>
+                            <input type="text" id="edit-displayname" class="input-control">
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" id="edit-password" class="input-control">
+                        </div>
+                        <div class="input-group">
+                            <label>Role</label>
+                            <select id="edit-role" class="input-control">
+                                <option value="User">User</option>
+                                <option value="Operator">Operator</option>
+                                <option value="Administrator">Administrator</option>
+                            </select>
+                        </div>
+                        <div class="pump-assignment-section">
+                            <h3>Assigned Pumps</h3>
+                            <div id="pump-assignment-list" class="assignment-grid">
+                                <!-- Checkboxes for all system pumps -->
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-secondary" id="btn-close-modal-cancel">Cancel</button>
+                            <button class="btn btn-primary" id="save-user-btn">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal">
+            <div class="modal-icon warning">
+                <i data-lucide="alert-circle"></i>
+            </div>
+            <h3>Confirm Change</h3>
+            <p>Are you sure you want to update the Setpoint Pressure to <span id="modal-new-val"></span> bar?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancel-change">Cancel</button>
+                <button class="btn btn-primary" id="confirm-change">Confirm Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="model.js"></script>
+    <script src="view.js"></script>
+    <script src="controller.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

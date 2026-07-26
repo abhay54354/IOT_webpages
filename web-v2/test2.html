@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Operations Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --panel: #0d2034;
+            --panel-2: #0a1a2d;
+            --line: #19344d;
+            --muted: #9aaabd;
+            --blue: #078fee;
+            --green: #52bd45;
+            --red: #fa513e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, Arial, sans-serif;
+            color: #e9f2fc;
+            background: radial-gradient(circle at 45% -60%, #143552, #061426 58%);
+        }
+
+        .dashboard {
+            max-width: 1640px;
+            margin: auto;
+            padding: 8px;
+        }
+
+        .card-panel {
+            height: 100%;
+            min-height: 183px;
+            border: 1px solid rgba(54, 91, 123, .22);
+            background: linear-gradient(118deg, rgba(14, 36, 57, .98), rgba(8, 26, 45, .98));
+            border-radius: 7px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255, 255, 255, .02);
+            overflow: hidden;
+        }
+
+        .panel-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #d8e5f1;
+        }
+
+        .period {
+            border: 0;
+            background: transparent;
+            color: #c9d5e1;
+            font-size: 11px;
+            padding: 0;
+        }
+
+        .period:focus {
+            box-shadow: none;
+            color: #fff;
+        }
+
+        .chart-area {
+            height: 138px;
+            padding: 4px 12px 9px 4px;
+        }
+
+        #trend {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .grid {
+            stroke: #254158;
+            stroke-width: 1;
+            opacity: .52;
+        }
+
+        .axis {
+            fill: #b3c1cf;
+            font-size: 10px;
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        .trend-line {
+            fill: none;
+            stroke: var(--green);
+            stroke-width: 2.5;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 3px rgba(80, 190, 69, .35));
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            animation: draw 2s ease forwards;
+        }
+
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Adjusted gap from 25px to 15px to fit the new axis */
+        .tank-wrap {
+            height: 135px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding-top: 0;
+        }
+
+        /* New Tank Y-Axis styles */
+        .tank-y-axis {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 108px;
+            color: var(--muted);
+            font-size: 10px;
+            text-align: right;
+        }
+
+        .tank {
+            width: 68px;
+            height: 108px;
+            position: relative;
+            border: 3px solid #1c3a57;
+            border-radius: 10px 10px 9px 9px;
+            background: #0c2035;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, .35), 0 0 2px rgba(103, 167, 218, .2);
+        }
+
+        .water {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 68%;
+            background: linear-gradient(90deg, #0388e7, #079bed);
+            animation: water-rise 1.5s cubic-bezier(.2, .8, .2, 1);
+        }
+
+        .water:before {
+            content: "";
+            position: absolute;
+            left: -11%;
+            top: -7px;
+            width: 122%;
+            height: 14px;
+            border-radius: 50%;
+            background: #209eee;
+            animation: wave 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes water-rise {
+            from {
+                height: 0;
+            }
+
+            to {
+                height: 68%;
+            }
+        }
+
+        @keyframes wave {
+            to {
+                transform: translateX(8px) scaleY(.8);
+            }
+        }
+
+        .level-number {
+            font-size: 31px;
+            font-weight: 600;
+            letter-spacing: -1.8px;
+            line-height: 1;
+        }
+
+        .level-number small {
+            font-size: 17px;
+            letter-spacing: -.5px;
+        }
+
+        .metric-label {
+            color: #bdc9d4;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .status {
+            margin-top: 14px;
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status svg {
+            width: 16px;
+            height: 16px;
+            filter: drop-shadow(0 0 4px rgba(76, 193, 69, .45));
+        }
+
+        .view-all {
+            color: #1688db;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .alarm {
+            display: flex;
+            gap: 15px;
+            padding: 13px 16px;
+        }
+
+        .alarm+.alarm {
+            border-top: 1px solid rgba(73, 105, 132, .2);
+        }
+
+        .alarm-icon {
+            width: 23px;
+            flex: 0 0 23px;
+            color: var(--red);
+            margin-top: 0;
+            filter: drop-shadow(0 0 4px rgba(247, 77, 56, .2));
+        }
+
+        .alarm-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #e5edf5;
+            line-height: 1.25;
+        }
+
+        .alarm-desc {
+            color: #97a9ba;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .alarm-time {
+            margin-left: auto;
+            white-space: nowrap;
+            color: #adbdcb;
+            font-size: 10px;
+            padding-top: 2px;
+        }
+
+        @media (max-width: 767px) {
+            .dashboard {
+                padding: 12px;
+            }
+
+            .card-panel {
+                min-height: 170px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="dashboard">
+        <div class="row g-2">
+            <section class="col-lg-5">
+                <div class="card-panel p-2">
+                    <div class="d-flex justify-content-between align-items-center px-1">
+                        <h2 class="panel-title mb-0">PRESSURE TREND (BAR)</h2><select class="period" id="range"
+                            aria-label="Chart period">
+                            <option>Last 1 Hour</option>
+                            <option>Last 6 Hours</option>
+                            <option>Today</option>
+                        </select>
+                    </div>
+                    <div class="chart-area"><svg id="trend" viewBox="0 0 500 165" preserveAspectRatio="none"
+                            aria-label="Pressure trend chart">
+                            <g id="grid"></g>
+                            <g id="labels"></g>
+                            <path id="line" class="trend-line"></path>
+                        </svg></div>
+                </div>
+            </section>
+            <section class="col-lg-3 col-md-5">
+                <div class="card-panel p-2">
+                    <h2 class="panel-title px-1 mb-0">TANK LEVEL</h2>
+
+                    <div class="tank-wrap">
+                        <!-- Added Tank Y-Axis Percentage Labels Here -->
+                        <div class="tank-y-axis">
+                            <span>100%</span>
+                            <span>75%</span>
+                            <span>50%</span>
+                            <span>25%</span>
+                            <span>0%</span>
+                        </div>
+
+                        <div class="tank">
+                            <div class="water"></div>
+                        </div>
+
+                        <div>
+                            <div class="level-number"><span id="levelValue">68</span><small>%</small></div>
+                            <div class="metric-label">Level</div>
+                            <div class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path d="M12 3c-3.7 4.2-5.5 7.1-5.5 10a5.5 5.5 0 0 0 11 0c0-2.9-1.8-5.8-5.5-10Z" />
+                                </svg>Normal</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+            <section class="col-lg-4 col-md-7">
+                <div class="card-panel p-2">
+                    <div class="d-flex justify-content-between align-items-center px-1">
+                        <h2 class="panel-title mb-0">ACTIVE ALARMS</h2><a class="view-all" href="#">View All</a>
+                    </div>
+                    <div class="alarm"><svg class="alarm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8">
+                            <path d="M10.3 3.8 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z" />
+                            <path d="M12 9v4M12 17h.01" />
+                        </svg>
+                        <div>
+                            <div class="alarm-title">Pump 2 Overload</div>
+                            <div class="alarm-desc">Motor current exceeded limit</div>
+                        </div><span class="alarm-time">10:28 AM</span>
+                    </div>
+                    <div class="alarm"><svg class="alarm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8">
+                            <path d="M10.3 3.8 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z" />
+                            <path d="M12 9v4M12 17h.01" />
+                        </svg>
+                        <div>
+                            <div class="alarm-title">Pressure Below Setpoint</div>
+                            <div class="alarm-desc">System pressure is below set pressure</div>
+                        </div><span class="alarm-time">10:25 AM</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <script>
+        const svgNS = 'http://www.w3.org/2000/svg', grid = document.getElementById('grid'), labels = document.getElementById('labels'), line = document.getElementById('line');
+        const W = 500, H = 165, L = 31, R = 7, T = 15, B = 28;
+        function el(name, attrs, parent) { const n = document.createElementNS(svgNS, name); Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v)); parent.appendChild(n); return n }
+        for (let i = 0; i <= 5; i++) { const y = T + (H - T - B) * i / 5; el('line', { x1: L, y1: y, x2: W - R, y2: y, class: 'grid' }, grid); el('text', { x: 1, y: y + 3, class: 'axis' }, labels).textContent = 10 - i * 2 }
+        for (let i = 0; i <= 6; i++) { const x = L + (W - L - R) * i / 6; el('line', { x1: x, y1: T, x2: x, y2: H - B, class: 'grid' }, grid); el('text', { x: x - 13, y: H - 5, class: 'axis' }, labels).textContent = ['09:30', '09:40', '09:50', '10:00', '10:10', '10:20', '10:30'][i] }
+        function makeData(amplitude = 1) { return Array.from({ length: 70 }, (_, i) => 6.4 + Math.sin(i * .35) * .22 + Math.sin(i * 1.7) * .18 + (i % 5 === 0 ? .2 : -.05) + (Math.random() - .5) * amplitude * .22) }
+        function draw(data) { const pts = data.map((v, i) => { const x = L + i * (W - L - R) / (data.length - 1), y = T + (10 - v) / 10 * (H - T - B); return `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}` }).join(' '); line.style.animation = 'none'; line.setAttribute('d', pts); void line.getBoundingClientRect(); line.style.animation = 'draw 1.5s ease forwards' }
+        draw(makeData()); document.getElementById('range').addEventListener('change', () => draw(makeData(1.5)));
+        setInterval(() => { const n = 67 + Math.floor(Math.random() * 3); document.getElementById('levelValue').textContent = n; document.querySelector('.water').style.height = n + '%'; }, 4000);
+    </script>
+</body>
+
+</html>

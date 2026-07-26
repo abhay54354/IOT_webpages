@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pump Status Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #f6f7fb;
+            --line: rgba(75, 133, 180, .29);
+            --panel: rgba(7, 34, 59, .82);
+            --green: #1ed241;
+            --yellow: #ffc400;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 46% 55%, rgba(10, 53, 86, .32), transparent 38%),
+                linear-gradient(135deg, #001629 0%, #00101f 53%, #00192e 100%);
+        }
+
+        .dashboard {
+            min-height: 100vh;
+        }
+
+        .pump-panel {
+            overflow: hidden;
+            border: 2px solid var(--line);
+            border-radius: 20px;
+            background: linear-gradient(112deg, rgba(8, 39, 66, .9), rgba(4, 27, 48, .84));
+            box-shadow: inset 0 1px rgba(143, 191, 229, .05), 0 14px 34px rgba(0, 0, 0, .12);
+        }
+
+        .pump-table {
+            --bs-table-bg: transparent;
+            --bs-table-color: var(--ink);
+            table-layout: fixed;
+        }
+
+        .pump-table th,
+        .pump-table td {
+            padding: 2.05rem 3.8%;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--line);
+        }
+
+        .pump-table thead th {
+            font-size: clamp(1.45rem, 2.12vw, 2.35rem);
+            font-weight: 750;
+            letter-spacing: -.035em;
+        }
+
+        .pump-table tbody td {
+            font-size: clamp(1.3rem, 2vw, 2.28rem);
+            font-weight: 400;
+            letter-spacing: -.04em;
+        }
+
+        .pump-table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .pump-table th:nth-child(1),
+        .pump-table td:nth-child(1) {
+            width: 26%;
+        }
+
+        .pump-table th:nth-child(2),
+        .pump-table td:nth-child(2) {
+            width: 20.5%;
+        }
+
+        .pump-table th:nth-child(3),
+        .pump-table td:nth-child(3) {
+            width: 18.8%;
+        }
+
+        .pump-table th:nth-child(4),
+        .pump-table td:nth-child(4) {
+            width: 20%;
+        }
+
+        .pump-table th:nth-child(5),
+        .pump-table td:nth-child(5) {
+            width: 14.7%;
+        }
+
+        .status {
+            font-weight: 750;
+            font-size: .93em;
+        }
+
+        .status-running {
+            color: var(--green);
+        }
+
+        .status-standby {
+            color: var(--yellow);
+        }
+
+        @media (max-width: 767.98px) {
+            .pump-panel {
+                border-radius: 15px;
+            }
+
+            .pump-table {
+                min-width: 690px;
+            }
+
+            .pump-table th,
+            .pump-table td {
+                padding: 1.3rem 1.65rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="dashboard d-flex align-items-center min-vh-100">
+        <section class="container-fluid px-3 px-md-4 px-xl-5" aria-labelledby="dashboard-title">
+            <h1 id="dashboard-title" class="visually-hidden">Pump Status Dashboard</h1>
+            <div class="pump-panel" role="region" aria-label="Pump operational status">
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle mb-0 pump-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Pump</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Mode</th>
+                                <th scope="col">Pressure</th>
+                                <th scope="col">Runtime</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pumpRows"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const pumps = [
+            { name: "Pump 1 (Main)", status: "RUNNING", mode: "AUTO", pressure: "5.1 Bar", runtime: "452 hrs" },
+            { name: "Pump 2 (Assist)", status: "RUNNING", mode: "AUTO", pressure: "5.0 Bar", runtime: "410 hrs" },
+            { name: "Pump 3 (Standby)", status: "STANDBY", mode: "AUTO", pressure: "–", runtime: "120 hrs" }
+        ];
+
+        const statusClass = (status) => status === "RUNNING" ? "status-running" : "status-standby";
+
+        document.querySelector("#pumpRows").innerHTML = pumps.map((pump) => `
+  <tr>
+    <td>${pump.name}</td>
+    <td><span class="status ${statusClass(pump.status)}">${pump.status}</span></td>
+    <td>${pump.mode}</td>
+    <td>${pump.pressure}</td>
+    <td>${pump.runtime}</td>
+  </tr>
+`).join("");
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCADA Pressure Dashboard</title>
+    <style>
+        :root {
+            --panel: #10233a;
+            --page: #0a1727;
+            --muted: #a8b8c9;
+            --line: #2e4762;
+            --green: #2fd16d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: var(--page);
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #fff;
+        }
+
+        .dashboard {
+            width: min(700px, 94vw);
+            min-height: 330px;
+            display: grid;
+            grid-template-columns: 1fr 1.08fr;
+            gap: 25px;
+            align-items: center;
+            padding: 25px 29px;
+            border-radius: 12px;
+            background: var(--panel);
+            box-shadow: 0 14px 32px #0008;
+        }
+
+        .gauge {
+            position: relative;
+            width: 280px;
+            height: 270px;
+            justify-self: center;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .track {
+            fill: none;
+            stroke: var(--line);
+            stroke-width: 13;
+            stroke-linecap: round;
+        }
+
+        .progress {
+            fill: none;
+            stroke: var(--green);
+            stroke-width: 13;
+            stroke-linecap: round;
+        }
+
+        .tick {
+            fill: #c9d5e1;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .needle {
+            transform-origin: 150px 150px;
+            transition: transform .5s cubic-bezier(.22, .8, .32, 1);
+        }
+
+        .needle line {
+            stroke: #eaf3ff;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .hub {
+            fill: #27415c;
+        }
+
+        .reading {
+            position: absolute;
+            top: 166px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .reading strong {
+            display: block;
+            font-size: 30px;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .reading span {
+            display: block;
+            margin-top: 3px;
+            font-size: 13px;
+            color: #d4e0ec;
+        }
+
+        .reading small {
+            display: block;
+            margin-top: 13px;
+            color: #d3dde8;
+            font-size: 12px;
+        }
+
+        .details {
+            padding-right: 3px;
+        }
+
+        .row {
+            height: 39px;
+            display: grid;
+            grid-template-columns: 18px 1fr auto;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #2a425b;
+            font-size: 13px;
+        }
+
+        .row:last-child {
+            border-bottom: 0;
+        }
+
+        .icon {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: #b6c5d4;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .label {
+            color: #d9e2eb;
+        }
+
+        .metric {
+            color: #dce7f1;
+            font-weight: 700;
+        }
+
+        .metric.auto {
+            color: var(--green);
+            font-size: 12px;
+        }
+
+        @media (max-width:620px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 0;
+                padding: 18px;
+            }
+
+            .details {
+                padding: 0 12px 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="dashboard">
+        <section class="gauge" aria-label="Current pressure gauge">
+            <svg viewBox="0 0 300 300" role="img">
+                <path class="track" d="M41 200 A119 119 0 1 1 259 200" />
+                <path id="progress" class="progress" d="M41 200 A119 119 0 1 1 259 200" />
+                <g class="tick"><text x="31" y="201">0</text><text x="49" y="126">2</text><text x="101"
+                        y="71">4</text><text x="183" y="71">6</text><text x="239" y="126">8</text><text x="245"
+                        y="201">10</text></g>
+                <g id="needle" class="needle">
+                    <line x1="150" y1="150" x2="150" y2="63" />
+                </g>
+                <circle class="hub" cx="150" cy="150" r="11" />
+            </svg>
+            <div class="reading"><strong id="pressure">5.1</strong><span>Bar</span><small>Current Pressure</small></div>
+        </section>
+        <section class="details" aria-label="Pressure system status">
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="6" />
+                    <path d="M10 10V6M10 10l3 2" />
+                </svg><span class="label">Set Pressure</span><span class="metric">5.5 Bar</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <rect x="4" y="4" width="12" height="12" rx="2" />
+                    <path d="M7 10h6M10 7v6" />
+                </svg><span class="label">Start Pressure</span><span class="metric">4.0 Bar</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="6" />
+                    <path d="M7 10h6" />
+                </svg><span class="label">Stop Pressure</span><span class="metric">6.5 Bar</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <path d="M5 4h10v12H5zM5 8h10" />
+                    <path d="M10 12v3" />
+                </svg><span class="label">Tank Level</span><span class="metric">68 %</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="6" />
+                    <circle cx="10" cy="10" r="2" />
+                </svg><span class="label">System Mode</span><span class="metric auto">AUTO</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="6" />
+                    <path d="M10 10V6M10 10l3 2" />
+                </svg><span class="label">Last Update</span><span id="time" class="metric">--:--:--</span></div>
+        </section>
+    </main>
+    <script>
+        const pressure = document.getElementById('pressure');
+        const needle = document.getElementById('needle');
+        const progress = document.getElementById('progress');
+        const time = document.getElementById('time');
+        const length = progress.getTotalLength();
+        progress.style.strokeDasharray = length;
+        function setPressure(value) {
+            const v = Math.max(0, Math.min(10, value));
+            pressure.textContent = v.toFixed(1);
+            needle.style.transform = `rotate(${-120 + v * 24}deg)`;
+            progress.style.strokeDashoffset = length * (1 - v / 10);
+        }
+        function updateTime() { time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+        setPressure(5.1); updateTime(); setInterval(updateTime, 1000);
+        
+    </script>
+</body>
+
+</html>

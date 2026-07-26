@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Aquatech — Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 240px;
+            --topbar-height: 64px;
+            --brand: #0b4a84;
+            --panel: #10233a;
+            --page: #0a1727;
+            --muted: #a8b8c9;
+            --line: #2e4762;
+            --green: #2fd16d;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--page);
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+
+        /* Topbar */
+        .topbar {
+            height: var(--topbar-height);
+            background: linear-gradient(180deg, var(--brand), #063a66);
+            color: #fff
+        }
+
+        .topbar .brand {
+            font-weight: 700;
+            letter-spacing: 0.6px
+        }
+
+        /* Sidebar */
+        .app-sidebar {
+            width: var(--sidebar-width);
+            background: #162533;
+            color: #dbe9f8;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: var(--topbar-height);
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+            z-index: 1020;
+        }
+
+        .app-sidebar .nav-link {
+            color: inherit;
+            padding: 18px 20px;
+            border-radius: 8px;
+            margin: 6px 8px
+        }
+
+        .app-sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff
+        }
+
+        .app-sidebar .nav-link.active {
+            background: linear-gradient(90deg, #0d6efd22, #0d6efd11);
+            box-shadow: inset 4px 0 0 #0d6efd;
+            color: #fff
+        }
+
+        /* Main content offset for large screens */
+        @media(min-width:992px) {
+            main.content {
+                margin-left: var(--sidebar-width);
+                margin-top: var(--topbar-height);
+            }
+        }
+
+        @media(max-width:991px) {
+            .app-sidebar {
+                display: none
+            }
+
+            main.content {
+                margin-top: var(--topbar-height)
+            }
+        }
+
+        .center-placeholder {
+            height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #445a6b
+        }
+
+        .center-placeholder i {
+            font-size: 44px;
+            margin-bottom: 18px;
+            color: #2f4f66
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* UPDATED DASHBOARD CLASS */
+        .dashboard {
+            width: auto; /* Fluidly adapts to margins without overflowing */
+            min-height: calc(50vh - var(--topbar-height)); /* Takes up full remaining screen height */
+            display: grid;
+            grid-template-columns: 1fr 1.08fr;
+            gap: 25px;
+            align-items: center;
+            padding: 25px 29px;
+            background: var(--panel);
+            /* Removed border-radius and box-shadow so it sits perfectly flush with the edges */
+        }
+
+        .gauge {
+            position: relative;
+            width: 280px;
+            height: 270px;
+            justify-self: center;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .track {
+            fill: none;
+            stroke: var(--line);
+            stroke-width: 13;
+            stroke-linecap: round;
+        }
+
+        .progress {
+            fill: none;
+            stroke: var(--green);
+            stroke-width: 13;
+            stroke-linecap: round;
+        }
+
+        .tick {
+            fill: #c9d5e1;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .needle {
+            transform-origin: 150px 150px;
+            transition: transform .5s cubic-bezier(.22, .8, .32, 1);
+        }
+
+        .needle line {
+            stroke: #eaf3ff;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .hub {
+            fill: #27415c;
+        }
+
+        .reading {
+            position: absolute;
+            top: 166px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .reading strong {
+            display: block;
+            font-size: 30px;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .reading span {
+            display: block;
+            margin-top: 3px;
+            font-size: 13px;
+            color: #d4e0ec;
+        }
+
+        .reading small {
+            display: block;
+            margin-top: 13px;
+            color: #d3dde8;
+            font-size: 12px;
+        }
+
+        .details {
+            padding-right: 3px;
+        }
+
+        .row {
+            height: 39px;
+            display: grid;
+            grid-template-columns: 18px 1fr auto;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #2a425b;
+            font-size: 13px;
+            margin: 0; /* Override default bootstrap row margin */
+        }
+
+        .row:last-child {
+            border-bottom: 0;
+        }
+
+        .icon {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: #b6c5d4;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .label {
+            color: #d9e2eb;
+        }
+
+        .metric {
+            color: #dce7f1;
+            font-weight: 700;
+        }
+
+        .metric.auto {
+            color: var(--green);
+            font-size: 12px;
+        }
+
+        @media (max-width:620px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 0;
+                padding: 18px;
+            }
+
+            .details {
+                padding: 0 12px 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- topbar -->
+    <nav class="topbar d-flex align-items-center px-3 fixed-top">
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-outline-light d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#mobileNav"><i
+                    class="bi bi-list"></i></button>
+            <div class="d-flex align-items-center">
+                <img src="https://www.meghdootpumps.com/assets/images/resources/logo-1.png" alt="logo" height="34" class="me-2">
+                <div class="brand">Maha-IOT <small class="text-light-opacity-50 d-block"
+                        style="opacity:.8;font-weight:300">PUMP Solutions</small></div>
+            </div>
+        </div>
+        <div class="ms-auto d-flex align-items-center">
+            <div class="me-3 text-light opacity-75 d-none d-md-block">Operator</div>
+            <div class="dropdown">
+                <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#"
+                    role="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle fs-4"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- sidebar (desktop) -->
+    <aside class="app-sidebar d-none d-lg-block">
+        <nav class="nav flex-column mt-2">
+            <a class="nav-link active" href="#"><i class="bi bi-house-fill me-2"></i> Dashboard</a>
+            <a class="nav-link" href="#"><i class="bi bi-hdd-fill me-2"></i> Pump Status</a>
+            <a class="nav-link" href="#"><i class="bi bi-heart-pulse me-2"></i> Pump Health</a>
+            <a class="nav-link" href="#"><i class="bi bi-bar-chart-line-fill me-2"></i> Live Data</a>
+            <a class="nav-link" href="#"><i class="bi bi-exclamation-triangle-fill me-2"></i> Alarms</a>
+            <a class="nav-link" href="#"><i class="bi bi-graph-up me-2"></i> Reports</a>
+            <a class="nav-link" href="#"><i class="bi bi-gear-fill me-2"></i> Settings</a>
+            <a class="nav-link text-danger mt-2" href="#"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <!-- mobile offcanvas nav -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileNav">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <nav class="nav flex-column">
+                <a class="nav-link active px-3" href="#">Dashboard</a>
+                <a class="nav-link px-3" href="#">Pump Status</a>
+                <a class="nav-link px-3" href="#">Pump Health</a>
+                <a class="nav-link px-3" href="#">Live Data</a>
+                <a class="nav-link px-3" href="#">Alarms</a>
+                <a class="nav-link px-3" href="#">Reports</a>
+                <a class="nav-link px-3" href="#">Settings</a>
+                <a class="nav-link px-3 text-danger" href="#">Logout</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- main content -->
+     <main class="dashboard content">
+        
+        <section class="gauge" aria-label="Current pressure gauge">
+
+            <svg viewBox="0 0 300 300" role="img">
+                <path class="track" d="M41 200 A119 119 0 1 1 259 200" />
+                <path id="progress" class="progress" d="M41 200 A119 119 0 1 1 259 200" />
+                <g class="tick">
+                    <text x="52" y="201">0</text>
+                    <text x="49" y="126">2</text>
+                    <text x="101"y="71">4</text>
+                    <text x="183" y="71">6</text>
+                    <text x="239" y="126">8</text>
+                    <text x="245"y="201">10</text>
+                </g>
+                <g id="needle" class="needle">
+                    <line x1="150" y1="150" x2="150" y2="63" />
+                </g>
+                <circle class="hub" cx="150" cy="150" r="11" />
+            </svg>
+
+            <div class="reading"><strong id="pressure">5.1</strong><span>Bar</span><small>Current Pressure</small></div>
+        </section>
+
+        <section class="details" aria-label="Pressure system status">
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="6" />
+                    <path d="M10 10V6M10 10l3 2" />
+                </svg><span class="label">Set Pressure</span><span class="metric">5.5 Bar</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <rect x="4" y="4" width="12" height="12" rx="2" />
+                    <path d="M7 10h6M10 7v6" />
+                </svg><span class="label">Start Pressure</span><span class="metric">4.0 Bar</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="6" />
+                    <path d="M7 10h6" />
+                </svg><span class="label">Stop Pressure</span><span class="metric">6.5 Bar</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <path d="M5 4h10v12H5zM5 8h10" />
+                    <path d="M10 12v3" />
+                </svg><span class="label">Tank Level</span><span class="metric">68 %</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="6" />
+                    <circle cx="10" cy="10" r="2" />
+                </svg><span class="label">System Mode</span><span class="metric auto">AUTO</span></div>
+            <div class="row"><svg class="icon" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="6" />
+                    <path d="M10 10V6M10 10l3 2" />
+                </svg><span class="label">Last Update</span><span id="time" class="metric">--:--:--</span></div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const pressure = document.getElementById('pressure');
+        const needle = document.getElementById('needle');
+        const progress = document.getElementById('progress');
+        const time = document.getElementById('time');
+        const length = progress.getTotalLength();
+        progress.style.strokeDasharray = length;
+        function setPressure(value) {
+            const v = Math.max(0, Math.min(10, value));
+            pressure.textContent = v.toFixed(1);
+            needle.style.transform = `rotate(${-120 + v * 24}deg)`;
+            progress.style.strokeDashoffset = length * (1 - v / 10);
+        }
+        function updateTime() { time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+        setPressure(5.1); updateTime(); setInterval(updateTime, 1000);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="meghdootApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meghdoot Pumps | Advanced Secure Portal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #062e5f;
+            --accent: #37aed0;
+            --accent-dark: #2d94b1;
+            --bg-dark: #010c1a;
+            --white: #ffffff;
+            --text-muted: #718096;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 5% 5%, rgba(55, 174, 208, 0.12) 0%, transparent 35%),
+                radial-gradient(circle at 95% 95%, rgba(6, 46, 95, 0.25) 0%, transparent 35%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            padding: 2rem 1rem;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--white);
+            border-radius: 2rem;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Branding Side */
+        .branding-side {
+            background: linear-gradient(135deg, var(--primary) 0%, #03152d 100%);
+            color: var(--white);
+            padding: 4rem 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .logo-wrapper {
+            background: var(--white);
+            padding: 1rem 1.8rem;
+            border-radius: 1rem;
+            display: inline-block;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .logo-img {
+            height: 45px;
+            display: block;
+        }
+
+        .vision-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1.1;
+            margin-bottom: 1.2rem;
+        }
+
+        .vision-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+        }
+
+        /* Project Grid */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .project-card {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .project-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .project-card:hover {
+            transform: scale(1.05);
+            border-color: var(--accent);
+            z-index: 10;
+        }
+
+        .project-card:hover img {
+            transform: scale(1.15);
+        }
+
+        /* Form Side */
+        .form-side {
+            padding: 5rem 4rem;
+            background: var(--white);
+        }
+
+        .login-header h1 {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.85rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .input-group-custom {
+            position: relative;
+            margin-bottom: 1.8rem;
+        }
+
+        .input-group-custom i {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            transition: color 0.3s;
+            z-index: 5;
+        }
+
+        .input-group-custom .form-control {
+            padding: 0.9rem 1rem 0.9rem 3.2rem;
+            border-radius: 12px;
+            border: 2px solid #edf2f7;
+            background: #f8fafc;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .input-group-custom .form-control:focus {
+            border-color: var(--accent);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(55, 174, 208, 0.1);
+        }
+
+        .input-group-custom .form-control:focus + i {
+            color: var(--accent);
+        }
+
+        .btn-login {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(6, 46, 95, 0.2);
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(55, 174, 208, 0.3);
+            color: var(--white);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Brand Scroller */
+        .client-scroller {
+            width: 100%;
+            margin-top: 4rem;
+            overflow: hidden;
+            position: relative;
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+
+        .scroller-track {
+            display: flex;
+            width: max-content;
+            animation: autoScroll 30s linear infinite;
+        }
+
+        .scroller-item {
+            padding: 0 40px;
+        }
+
+        .scroller-item img {
+            height: 40px;
+            filter: grayscale(1) opacity(0.6);
+            transition: all 0.4s;
+        }
+
+        .scroller-item img:hover {
+            filter: grayscale(0) opacity(1);
+            transform: scale(1.1);
+        }
+
+        @keyframes autoScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .branding-side {
+                padding: 3rem 2rem;
+            }
+            .form-side {
+                padding: 4rem 2rem;
+            }
+            .vision-title { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 767px) {
+            .project-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .auth-container {
+                border-radius: 1.5rem;
+            }
+        }
+
+        /* Angular States */
+        .ng-invalid.ng-dirty { border-color: #e53e3e !important; }
+        .error-msg { color: #e53e3e; font-size: 0.75rem; margin-top: 4px; display: block; }
+    </style>
+</head>
+<body ng-controller="LoginController">
+
+    <div class="container d-flex justify-content-center align-items-center">
+        <div class="auth-container">
+            <div class="row g-0">
+                <!-- Branding Section -->
+                <div class="col-lg-5 branding-side">
+                    <div>
+                        <div class="logo-wrapper">
+                            <img ng-src="{{companyLogo}}" alt="Meghdoot Logo" class="logo-img">
+                        </div>
+                        <h2 class="vision-title">World-Class Pumping Solutions</h2>
+                        <p class="vision-text">
+                            Our vision is to provide all these solutions with a touch of sustainability and contribute to the green foot prints of the planet.
+                        </p>
+                        
+                        <div class="projects-section mt-5">
+                            <h6 class="text-uppercase tracking-wider mb-3" style="color: var(--accent); font-size: 0.8rem; letter-spacing: 2px;">Recent Projects</h6>
+                            <div class="project-grid">
+                                <div class="project-card" ng-repeat="img in projects">
+                                    <img ng-src="{{img}}" alt="Project">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5 pt-4">
+                        <small class="opacity-50">© 2026 Meghdoot Pumps Pvt. Ltd.</small>
+                    </div>
+                </div>
+
+                <!-- Form Section -->
+                <div class="col-lg-7 form-side">
+                    <div class="login-header">
+                        <h1>Portal Login</h1>
+                        <p>Access your real-time industrial dashboard</p>
+                    </div>
+
+                    <form name="loginForm" ng-submit="submitLogin()" novalidate>
+                        <div class="mb-4">
+                            <label class="form-label">Work Email</label>
+                            <div class="input-group-custom">
+                                <input type="email" 
+                                       name="email"
+                                       class="form-control" 
+                                       placeholder="name@meghdoot.com" 
+                                       ng-model="user.email" 
+                                       required>
+                                <i class="fa-solid fa-envelope"></i>
+                                <span class="error-msg" ng-show="loginForm.email.$dirty && loginForm.email.$invalid">
+                                    Please enter a valid work email address.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Security Password</label>
+                            <div class="input-group-custom">
+                                <input type="password" 
+                                       name="password"
+                                       class="form-control" 
+                                       placeholder="••••••••" 
+                                       ng-model="user.password" 
+                                       required 
+                                       minlength="6">
+                                <i class="fa-solid fa-lock"></i>
+                                <span class="error-msg" ng-show="loginForm.password.$dirty && loginForm.password.$invalid">
+                                    Password must be at least 6 characters.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="remember" ng-model="user.remember">
+                                <label class="form-check-label text-muted" for="remember" style="font-size: 0.9rem;">
+                                    Stay logged in
+                                </label>
+                            </div>
+                            <a href="#" class="text-decoration-none" style="color: var(--accent); font-weight: 600; font-size: 0.9rem;">Forgot?</a>
+                        </div>
+
+                        <button type="submit" 
+                                class="btn btn-login" 
+                                ng-disabled="loginForm.$invalid || isLoading">
+                            <span ng-hide="isLoading">Sign In to Dashboard</span>
+                            <span ng-show="isLoading"><i class="fa-solid fa-circle-notch fa-spin"></i> Validating...</span>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-5">
+                        <span class="text-muted small">Need technical support?</span>
+                        <a href="mailto:support@meghdootpumps.com" class="ms-2 small fw-bold text-decoration-none" style="color: var(--accent);">Contact IT Desk</a>
+                    </div>
+
+                    <!-- Scroller -->
+                    <div class="client-scroller">
+                        <div class="scroller-track">
+                            <div class="scroller-item" ng-repeat="client in clients">
+                                <img ng-src="{{client}}" alt="Client">
+                            </div>
+                            <!-- Duplicate for loop -->
+                            <div class="scroller-item" ng-repeat="client in clients">
+                                <img ng-src="{{client}}" alt="Client">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('meghdootApp', []);
+
+        app.controller('LoginController', function($scope, $timeout) {
+            $scope.companyLogo = "https://www.meghdootpumps.com/assets/images/resources/logo-1.png";
+            
+            $scope.projects = [
+                "https://www.meghdootpumps.com/assets/projects/11.jpg",
+                "https://www.meghdootpumps.com/assets/projects/12.jpg",
+                "https://www.meghdootpumps.com/assets/projects/13.jpg",
+                "https://www.meghdootpumps.com/assets/projects/14.jpg",
+                "https://www.meghdootpumps.com/assets/projects/15.jpg",
+                "https://www.meghdootpumps.com/assets/projects/16.jpg",
+                "https://www.meghdootpumps.com/assets/projects/17.jpg",
+                "https://www.meghdootpumps.com/assets/projects/18.jpg"
+            ];
+
+            $scope.clients = [
+                "https://www.meghdootpumps.com/assets/clients/1.jpg",
+                "https://www.meghdootpumps.com/assets/clients/2.jpg",
+                "https://www.meghdootpumps.com/assets/clients/3.jpg",
+                "https://www.meghdootpumps.com/assets/clients/4.jpg",
+                "https://www.meghdootpumps.com/assets/clients/5.jpg",
+                "https://www.meghdootpumps.com/assets/clients/6.jpg",
+                "https://www.meghdootpumps.com/assets/clients/7.jpg",
+                "https://www.meghdootpumps.com/assets/clients/8.jpg"
+            ];
+
+            $scope.user = {
+                email: '',
+                password: '',
+                remember: false
+            };
+
+            $scope.isLoading = false;
+
+            $scope.submitLogin = function() {
+                if ($scope.loginForm.$valid) {
+                    $scope.isLoading = true;
+                    
+                    // Simulate API Call
+                    $timeout(function() {
+                        alert('Login Successful! Welcome, ' + $scope.user.email);
+                        $scope.isLoading = false;
+                    }, 2000);
+                }
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Aquatech — Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --sidebar-width: 240px;
+            --topbar-height: 64px;
+            --brand: #0b4a84;
+            --panel: #10233a;
+            --page: #0a1727;
+            --muted: #a8b8c9;
+            --line: #2e4762;
+            --green: #2fd16d;
+            --red: #fa513e;
+            --blue: #078fee;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--page);
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Topbar */
+        .topbar {
+            height: var(--topbar-height);
+            background: linear-gradient(180deg, var(--brand), #063a66);
+            color: #fff;
+        }
+
+        .topbar .brand {
+            font-weight: 700;
+            letter-spacing: 0.6px;
+        }
+
+        /* Sidebar */
+        .app-sidebar {
+            width: var(--sidebar-width);
+            background: #162533;
+            color: #dbe9f8;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: var(--topbar-height);
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+            z-index: 1020;
+        }
+
+        .app-sidebar .nav-link {
+            color: inherit;
+            padding: 18px 20px;
+            border-radius: 8px;
+            margin: 6px 8px;
+        }
+
+        .app-sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+        }
+
+        .app-sidebar .nav-link.active {
+            background: linear-gradient(90deg, #0d6efd22, #0d6efd11);
+            box-shadow: inset 4px 0 0 #0d6efd;
+            color: #fff;
+        }
+
+        /* Main content offset */
+        @media(min-width:992px) {
+            main.content {
+                margin-left: var(--sidebar-width);
+                margin-top: var(--topbar-height);
+            }
+        }
+        @media(max-width:991px) {
+            .app-sidebar { display: none; }
+            main.content { margin-top: var(--topbar-height); }
+        }
+
+        /* Dashboard Container */
+        .dashboard {
+            width: auto;
+            min-height: calc(100vh - var(--topbar-height));
+            padding: 25px 29px;
+        }
+
+        /* Top Panel (Gauge & Details) */
+        .top-panel {
+            display: grid;
+            grid-template-columns: 1fr 1.08fr;
+            gap: 25px;
+            align-items: center;
+            background: var(--panel);
+            padding: 25px 29px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        /* Gauge */
+        .gauge {
+            position: relative;
+            width: 280px;
+            height: 270px;
+            justify-self: center;
+        }
+
+        svg.gauge-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .track {
+            fill: none;
+            stroke: var(--line);
+            stroke-width: 13;
+            stroke-linecap: round;
+        }
+
+        .progress {
+            fill: none;
+            stroke: var(--green);
+            stroke-width: 13;
+            stroke-linecap: round;
+        }
+
+        .tick {
+            fill: #c9d5e1;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .needle {
+            transform-origin: 150px 150px;
+            transition: transform .5s cubic-bezier(.22, .8, .32, 1);
+        }
+
+        .needle line {
+            stroke: #eaf3ff;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .hub {
+            fill: #27415c;
+        }
+
+        .reading {
+            position: absolute;
+            top: 166px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .reading strong {
+            display: block;
+            font-size: 30px;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .reading span {
+            display: block;
+            margin-top: 3px;
+            font-size: 13px;
+            color: #d4e0ec;
+        }
+
+        .reading small {
+            display: block;
+            margin-top: 13px;
+            color: #d3dde8;
+            font-size: 12px;
+        }
+
+        /* Details */
+        .details {
+            padding-right: 3px;
+        }
+
+        .detail-row {
+            height: 39px;
+            display: grid;
+            grid-template-columns: 18px 1fr auto;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #2a425b;
+            font-size: 13px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: 0;
+        }
+
+        .icon {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: #b6c5d4;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .label { color: #d9e2eb; }
+        .metric { color: #dce7f1; font-weight: 700; }
+        .metric.auto { color: var(--green); font-size: 12px; }
+
+        @media (max-width:620px) {
+            .dashboard { padding: 18px; }
+            .top-panel { grid-template-columns: 1fr; gap: 0; padding: 18px; }
+            .details { padding: 0 12px 8px; }
+        }
+
+        /* -----------------------
+           Bottom Cards Section
+           ----------------------- */
+        .card-panel {
+            height: 100%;
+            min-height: 183px;
+            border: 1px solid var(--line);
+            background: linear-gradient(118deg, rgba(14,36,57,.98), rgba(8,26,45,.98));
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.02);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #d8e5f1;
+            margin: 0;
+        }
+
+        /* Chart */
+        .period { border: 0; background: transparent; color: #c9d5e1; font-size: 11px; padding: 0; }
+        .period:focus { box-shadow: none; color: #fff; outline: none; }
+        .chart-area { flex: 1; height: 138px; padding: 4px 12px 9px 4px; }
+        #trend { width: 100%; height: 100%; display: block; }
+        .grid { stroke: #254158; stroke-width: 1; opacity: .52; }
+        .axis { fill: #b3c1cf; font-size: 10px; font-family: Inter, Arial, sans-serif; }
+        .trend-line { fill: none; stroke: var(--green); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 3px rgba(47, 209, 109, .35)); stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 2s ease forwards; }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+
+        /* Tank Level */
+        .tank-wrap {
+            height: 135px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding-top: 0;
+            flex: 1;
+        }
+        
+        .tank-y-axis {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 108px;
+            color: var(--muted);
+            font-size: 10px;
+            text-align: right;
+        }
+
+        .tank {
+            width: 68px;
+            height: 108px;
+            position: relative;
+            border: 3px solid #1c3a57;
+            border-radius: 10px 10px 9px 9px;
+            background: #0c2035;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,.35), 0 0 2px rgba(103,167,218,.2);
+        }
+        .water {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 68%;
+            background: linear-gradient(90deg, #0388e7, #079bed);
+            transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: water-rise 1.5s cubic-bezier(.2,.8,.2,1);
+        }
+        .water:before {
+            content: "";
+            position: absolute;
+            left: -11%;
+            top: -7px;
+            width: 122%;
+            height: 14px;
+            border-radius: 50%;
+            background: #209eee;
+            animation: wave 2.5s ease-in-out infinite alternate;
+        }
+        @keyframes water-rise { from { height: 0; } to { height: 68%; } }
+        @keyframes wave { to { transform: translateX(8px) scaleY(.8); } }
+        
+        .level-number { font-size: 31px; font-weight: 600; letter-spacing: -1.8px; line-height: 1; }
+        .level-number small { font-size: 17px; letter-spacing: -.5px; }
+        .metric-label { color: #bdc9d4; font-size: 11px; margin-top: 5px; }
+        .status { margin-top: 14px; color: var(--green); font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .status svg { width: 16px; height: 16px; filter: drop-shadow(0 0 4px rgba(47, 209, 109, .45)); }
+
+        /* Alarms */
+        .view-all { color: #1688db; text-decoration: none; font-size: 11px; font-weight: 600; }
+        .alarm { display: flex; gap: 15px; padding: 13px 16px; }
+        .alarm + .alarm { border-top: 1px solid rgba(73,105,132,.2); }
+        .alarm-icon { width: 23px; flex: 0 0 23px; color: var(--red); margin-top: 0; filter: drop-shadow(0 0 4px rgba(250, 81, 62, .2)); }
+        .alarm-title { font-size: 12px; font-weight: 600; color: #e5edf5; line-height: 1.25; }
+        .alarm-desc { color: #97a9ba; font-size: 10px; margin-top: 4px; }
+        .alarm-time { margin-left: auto; white-space: nowrap; color: #adbdcb; font-size: 10px; padding-top: 2px; }
+
+    </style>
+</head>
+
+<body>
+    <!-- topbar -->
+    <nav class="topbar d-flex align-items-center px-3 fixed-top">
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-outline-light d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#mobileNav"><i class="bi bi-list"></i></button>
+            <div class="d-flex align-items-center">
+                <img src="https://www.meghdootpumps.com/assets/images/resources/logo-1.png" alt="logo" height="34" class="me-2">
+                <div class="brand">Maha-IOT <small class="text-light-opacity-50 d-block" style="opacity:.8;font-weight:300">PUMP Solutions</small></div>
+            </div>
+        </div>
+        <div class="ms-auto d-flex align-items-center">
+            <div class="me-3 text-light opacity-75 d-none d-md-block">Operator</div>
+            <div class="dropdown">
+                <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle fs-4"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- sidebar (desktop) -->
+    <aside class="app-sidebar d-none d-lg-block">
+        <nav class="nav flex-column mt-2">
+            <a class="nav-link active" href="#"><i class="bi bi-house-fill me-2"></i> Dashboard</a>
+            <a class="nav-link" href="#"><i class="bi bi-hdd-fill me-2"></i> Pump Status</a>
+            <a class="nav-link" href="#"><i class="bi bi-heart-pulse me-2"></i> Pump Health</a>
+            <a class="nav-link" href="#"><i class="bi bi-bar-chart-line-fill me-2"></i> Live Data</a>
+            <a class="nav-link" href="#"><i class="bi bi-exclamation-triangle-fill me-2"></i> Alarms</a>
+            <a class="nav-link" href="#"><i class="bi bi-graph-up me-2"></i> Reports</a>
+            <a class="nav-link" href="#"><i class="bi bi-gear-fill me-2"></i> Settings</a>
+            <a class="nav-link text-danger mt-2" href="#"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <!-- mobile offcanvas nav -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileNav">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <nav class="nav flex-column">
+                <a class="nav-link active px-3" href="#">Dashboard</a>
+                <a class="nav-link px-3" href="#">Pump Status</a>
+                <a class="nav-link px-3" href="#">Pump Health</a>
+                <a class="nav-link px-3" href="#">Live Data</a>
+                <a class="nav-link px-3" href="#">Alarms</a>
+                <a class="nav-link px-3" href="#">Reports</a>
+                <a class="nav-link px-3" href="#">Settings</a>
+                <a class="nav-link px-3 text-danger" href="#">Logout</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- main content -->
+    <main class="dashboard content">
+        
+        <!-- Top Section -->
+        <div class="top-panel">
+            <section class="gauge" aria-label="Current pressure gauge">
+                <svg class="gauge-svg" viewBox="0 0 300 300" role="img">
+                    <path class="track" d="M41 200 A119 119 0 1 1 259 200" />
+                    <path id="progress" class="progress" d="M41 200 A119 119 0 1 1 259 200" />
+                    <g class="tick">
+                        <text x="52" y="201">0</text>
+                        <text x="49" y="126">2</text>
+                        <text x="101" y="71">4</text>
+                        <text x="183" y="71">6</text>
+                        <text x="239" y="126">8</text>
+                        <text x="245" y="201">10</text>
+                    </g>
+                    <g id="needle" class="needle">
+                        <line x1="150" y1="150" x2="150" y2="63" />
+                    </g>
+                    <circle class="hub" cx="150" cy="150" r="11" />
+                </svg>
+                <div class="reading"><strong id="pressure">5.1</strong><span>Bar</span><small>Current Pressure</small></div>
+            </section>
+
+            <section class="details" aria-label="Pressure system status">
+                <div class="detail-row">
+                    <svg class="icon" viewBox="0 0 20 20">
+                        <circle cx="10" cy="10" r="6" />
+                        <path d="M10 10V6M10 10l3 2" />
+                    </svg>
+                    <span class="label">Set Pressure</span>
+                    <span class="metric">5.5 Bar</span>
+                </div>
+                <div class="detail-row">
+                    <svg class="icon" viewBox="0 0 20 20">
+                        <rect x="4" y="4" width="12" height="12" rx="2" />
+                        <path d="M7 10h6M10 7v6" />
+                    </svg>
+                    <span class="label">Start Pressure</span>
+                    <span class="metric">4.0 Bar</span>
+                </div>
+                <div class="detail-row">
+                    <svg class="icon" viewBox="0 0 20 20">
+                        <circle cx="10" cy="10" r="6" />
+                        <path d="M7 10h6" />
+                    </svg>
+                    <span class="label">Stop Pressure</span>
+                    <span class="metric">6.5 Bar</span>
+                </div>
+                <div class="detail-row">
+                    <svg class="icon" viewBox="0 0 20 20">
+                        <path d="M5 4h10v12H5zM5 8h10" />
+                        <path d="M10 12v3" />
+                    </svg>
+                    <span class="label">Tank Level</span>
+                    <span class="metric" id="topTankMetric">68 %</span>
+                </div>
+                <div class="detail-row">
+                    <svg class="icon" viewBox="0 0 20 20">
+                        <circle cx="10" cy="10" r="6" />
+                        <circle cx="10" cy="10" r="2" />
+                    </svg>
+                    <span class="label">System Mode</span>
+                    <span class="metric auto">AUTO</span>
+                </div>
+                <div class="detail-row">
+                    <svg class="icon" viewBox="0 0 20 20">
+                        <circle cx="10" cy="10" r="6" />
+                        <path d="M10 10V6M10 10l3 2" />
+                    </svg>
+                    <span class="label">Last Update</span>
+                    <span id="time" class="metric">--:--:--</span>
+                </div>
+            </section>
+        </div>
+
+        <!-- Bottom Cards Section -->
+        <div class="row g-3">
+            
+            <!-- Trend Chart -->
+            <section class="col-lg-5">
+                <div class="card-panel p-2">
+                    <div class="d-flex justify-content-between align-items-center px-2 pt-1 pb-2">
+                        <h2 class="panel-title mb-0">PRESSURE TREND (BAR)</h2>
+                        <select class="period" id="range" aria-label="Chart period">
+                            <option>Last 1 Hour</option>
+                            <option>Last 6 Hours</option>
+                            <option>Today</option>
+                        </select>
+                    </div>
+                    <div class="chart-area">
+                        <svg id="trend" viewBox="0 0 500 165" preserveAspectRatio="none" aria-label="Pressure trend chart">
+                            <g id="grid"></g>
+                            <g id="labels"></g>
+                            <path id="line" class="trend-line"></path>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tank Level -->
+            <section class="col-lg-3 col-md-5">
+                <div class="card-panel p-2">
+                    <h2 class="panel-title px-2 pt-1 pb-1 mb-0">TANK LEVEL</h2>
+                    <div class="tank-wrap">
+                        <div class="tank-y-axis">
+                            <span>100%</span>
+                            <span>75%</span>
+                            <span>50%</span>
+                            <span>25%</span>
+                            <span>0%</span>
+                        </div>
+                        <div class="tank"><div class="water" id="animatedWater"></div></div>
+                        <div>
+                            <div class="level-number"><span id="levelValue">68</span><small>%</small></div>
+                            <div class="metric-label">Level</div>
+                            <div class="status">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M12 3c-3.7 4.2-5.5 7.1-5.5 10a5.5 5.5 0 0 0 11 0c0-2.9-1.8-5.8-5.5-10Z"/>
+                                </svg>
+                                Normal
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Alarms -->
+            <section class="col-lg-4 col-md-7">
+                <div class="card-panel py-2">
+                    <div class="d-flex justify-content-between align-items-center px-3 pt-1 pb-2">
+                        <h2 class="panel-title mb-0">ACTIVE ALARMS</h2>
+                        <a class="view-all" href="#">View All</a>
+                    </div>
+                    <div class="alarm">
+                        <svg class="alarm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M10.3 3.8 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/>
+                            <path d="M12 9v4M12 17h.01"/>
+                        </svg>
+                        <div>
+                            <div class="alarm-title">Pump 2 Overload</div>
+                            <div class="alarm-desc">Motor current exceeded limit</div>
+                        </div>
+                        <span class="alarm-time">10:28 AM</span>
+                    </div>
+                    <div class="alarm">
+                        <svg class="alarm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M10.3 3.8 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/>
+                            <path d="M12 9v4M12 17h.01"/>
+                        </svg>
+                        <div>
+                            <div class="alarm-title">Pressure Below Setpoint</div>
+                            <div class="alarm-desc">System pressure is below set pressure</div>
+                        </div>
+                        <span class="alarm-time">10:25 AM</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // -------------------------
+        // Gauge & Time Logic
+        // -------------------------
+        const pressure = document.getElementById('pressure');
+        const needle = document.getElementById('needle');
+        const progress = document.getElementById('progress');
+        const time = document.getElementById('time');
+        const length = progress.getTotalLength();
+        progress.style.strokeDasharray = length;
+        
+        function setPressure(value) {
+            const v = Math.max(0, Math.min(10, value));
+            pressure.textContent = v.toFixed(1);
+            needle.style.transform = `rotate(${-120 + v * 24}deg)`;
+            progress.style.strokeDashoffset = length * (1 - v / 10);
+        }
+        
+        function updateTime() { 
+            time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); 
+        }
+        
+        setPressure(5.1); 
+        updateTime(); 
+        setInterval(updateTime, 1000);
+
+        // -------------------------
+        // Trend Chart Logic
+        // -------------------------
+        const svgNS = 'http://www.w3.org/2000/svg';
+        const grid = document.getElementById('grid');
+        const labels = document.getElementById('labels');
+        const line = document.getElementById('line');
+        const W = 500, H = 165, L = 31, R = 7, T = 15, B = 28;
+        
+        function el(name, attrs, parent) {
+            const n = document.createElementNS(svgNS, name);
+            Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+            parent.appendChild(n);
+            return n;
+        }
+        
+        // Build Grid and Y-Axis
+        for (let i = 0; i <= 5; i++) {
+            const y = T + (H - T - B) * i / 5;
+            el('line', { x1: L, y1: y, x2: W - R, y2: y, class: 'grid' }, grid);
+            el('text', { x: 1, y: y + 3, class: 'axis' }, labels).textContent = 10 - i * 2;
+        }
+        // Build X-Axis
+        for (let i = 0; i <= 6; i++) {
+            const x = L + (W - L - R) * i / 6;
+            el('line', { x1: x, y1: T, x2: x, y2: H - B, class: 'grid' }, grid);
+            el('text', { x: x - 13, y: H - 5, class: 'axis' }, labels).textContent = ['09:30', '09:40', '09:50', '10:00', '10:10', '10:20', '10:30'][i];
+        }
+        
+        function makeData(amplitude = 1) {
+            return Array.from({ length: 70 }, (_, i) => 6.4 + Math.sin(i * .35) * .22 + Math.sin(i * 1.7) * .18 + (i % 5 === 0 ? .2 : -.05) + (Math.random() - .5) * amplitude * .22);
+        }
+        
+        function draw(data) {
+            const pts = data.map((v, i) => {
+                const x = L + i * (W - L - R) / (data.length - 1);
+                const y = T + (10 - v) / 10 * (H - T - B);
+                return `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`;
+            }).join(' ');
+            line.style.animation = 'none';
+            line.setAttribute('d', pts);
+            void line.getBoundingClientRect(); // trigger reflow
+            line.style.animation = 'draw 1.5s ease forwards';
+        }
+        
+        draw(makeData());
+        document.getElementById('range').addEventListener('change', () => draw(makeData(1.5)));
+
+        // -------------------------
+        // Tank Level Logic
+        // -------------------------
+        setInterval(() => {
+            const n = 67 + Math.floor(Math.random() * 3);
+            document.getElementById('levelValue').textContent = n;
+            document.getElementById('topTankMetric').textContent = n + ' %';
+            document.getElementById('animatedWater').style.height = n + '%';
+        }, 4000);
+    </script>
+</body>
+</html>
